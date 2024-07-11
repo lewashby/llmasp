@@ -7,7 +7,7 @@ LLMASP is a framework that tries to unify the potential of Large Language Models
 Install [poetry](https://python-poetry.org/docs/) following the official documentation.
 
 ```bash
-git clone https://repo.url.git
+git clone https://github.com/LewAshby/llmasp.git
 cd llmasp
 poetry install
 ```
