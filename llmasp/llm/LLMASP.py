@@ -21,6 +21,8 @@ class LLMASP(AbstractLLMASP):
     def __create_queries(self, user_input: str):
         queries = {}
         context = self.behavior["datalog"]["context"]
+        _, preprocessing_context = self.__get_property(self.config["preprocessing"], "_")
+        context = re.sub(r"\{context\}", preprocessing_context, context)
         for index, query in enumerate(self.config["preprocessing"]):
             queries[index] = []
             queries[index].append(self.__prompt("system", self.behavior["datalog"]["behavior"]))

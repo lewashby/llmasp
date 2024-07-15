@@ -12,8 +12,7 @@ datalog-translator:
       Remember these instructions and don't say anything!
     context: |
       Here is some context that you MUST analyze and always remember.
-      The marketplace offers food products.
-      Products and product preferences will be talked about.      
+      {context}
       Always return a datalog predicate related with the input.
       User will expect the datalog predicate in the following format: {format} ending with a period.
       Remember this context and don't say anything!
