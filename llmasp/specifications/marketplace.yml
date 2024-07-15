@@ -1,49 +1,10 @@
 preprocessing:
 - product_request("product").: List all the products mentioned or requested. If a product is named MUST be listed. Ignore plural, always write the product name in singular.
-- product_request("product", quantity).: List all the products mentioned or requested if they have a quantity associated. Ignore plural, always write the product name in singular.
+- product_request("product", quantity).: List all the products mentioned or requested if and only if they have a quantity associated. Ignore plural, always write the product name in singular.
 
-knowledge_base: | 
-  product("apple").
-  product("meat").
-  product("onion").
-  product_calories("apple",1).
-  product_calories("meat",2).
-  product_calories("onion",1).
-  seller("Lattanzi").
-  seller("Verza").
-  seller("Rellman").
-  seller("Serravalle").
-  warehouse("Lattanzi Warehouse").
-  warehouse("Verza Warehouse").
-  warehouse("Rellman Warehouse").
-  warehouse("Serravalle Warehouse").
-  warehouse_shipping_cost("Lattanzi Warehouse", 20).
-  warehouse_shipping_cost("Verza Warehouse", 10).
-  warehouse_shipping_cost("Rellman Warehouse", 15).
-  warehouse_shipping_cost("Serravalle Warehouse", 35).
-  warehouse_shipping_fee("Lattanzi Warehouse", 5).
-  warehouse_shipping_fee("Verza Warehouse", 3).
-  warehouse_shipping_fee("Rellman Warehouse", 8).
-  warehouse_shipping_fee("Serravalle Warehouse", 2).
-  seller_warehouse("Lattanzi", "Lattanzi Warehouse").
-  seller_warehouse("Verza", "Verza Warehouse").
-  seller_warehouse("Rellman", "Rellman Warehouse").
-  seller_warehouse("Serravalle", "Serravalle Warehouse").
-  product_in_warehouse("apple", "Lattanzi Warehouse", 20).
-  product_in_warehouse("apple", "Verza Warehouse", 3).
-  product_in_warehouse("meat", "Rellman Warehouse", 10).
-  product_in_warehouse("onion", "Serravalle Warehouse", 5).
-  product_price("apple", "Lattanzi Warehouse", 2).
-  product_price("apple", "Verza Warehouse", 4).
-  product_price("meat", "Rellman Warehouse", 7).
-  product_price("onion", "Serravalle Warehouse", 3).
-  recipe("Apple and Onion").
-  recipe("Meat and Onion").
-  recipe_ingredient("Apple and Onion", "apple", 4).
-  recipe_ingredient("Apple and Onion", "onion", 2).
-  recipe_ingredient("Meat and Onion", "meat", 5).
-  recipe_ingredient("Meat and Onion", "onion", 1).
+knowledge_base_file: ./specifications/db.yml
 
+encoding: | 
   % guess selection of products
   {select(P,W,Q',T) : Q' = 1..@min(Q,R), T=Q'*PP+C} <= 1 :-
     product_request(P,R),
@@ -79,6 +40,9 @@ knowledge_base: |
   :- product_request(P),
     #sum{ Q,R,W : select_for_recipe(R,P,W,Q,_); -A,R : recipe_ingredient(R, P, A) } != 0.
 
+  { matching_recipe(R, P) } = 1 :- product_request(P), recipe_ingredient(R,P,_).
+
+
   % healthy products
   { select_healthy_product(P, C) : product_calories(P,C), product_request(P) } <= 1.
   :~ select_healthy_product(P, C). [C@1, P]
@@ -86,11 +50,14 @@ knowledge_base: |
   #show select/4.
   #show select_for_recipe/5.
   #show select_healthy_product/2.
+  #show matching_recipe/2.
 
 postprocessing:
 - _: Explain the facts in a human readable way, as a paragraph.
-- summary: "Summarize the following test in just one sentence as a response for a customer, making suggestions about products and costs if known. Do not specify that you are doing a summary: {response}"
-- translation: "Each fact matching {fact} must be interpreted as follows: {meaning}"
-- select_for_recipe("recipe", "product", "warehouse", "quantity", "total").: Suggest to make "recipe" selecting "quantity" of "product" from "warehouse".
-- select("product", "warehouse", "quantity", "total").: Suggest to select "quantity" of the "product" for a cost of "total" including shipping from the "warehouse".
+- summarize: "Summarize the following test between triple brackets in just one sentence as a response for a customer, making suggestions about products and costs if known, costs ALWAYS include shipping: ```{response}```"
+- translation: "Each fact matching the following format: {fact} must be translated as follows: {meaning}"
+- failed: "Say you apologize, you cannot help you with your request."
+- select_for_recipe("recipe", "product", "warehouse", "quantity", "total").: Say to buy "quantity" of "product" for "total" including shipping costs from "warehouse" if the customer desire to make "recipe". Do not forget the quantity.
+- select("product", "warehouse", "quantity", "total").: Suggest to select "quantity" of the "product" for a cost of "total" from the "warehouse". This price include the shipping costs.
 - select_healthy_product("product", "calories"): Make a comment about "calories" of "product".
+- matching_recipe("recipe", "product"): Suggest that "recipe" can be done with "product".

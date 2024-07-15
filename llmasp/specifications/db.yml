@@ -1,0 +1,59 @@
+database: |
+  product("apple").
+  product("meat").
+  product("onion").
+  product("banana").
+  product("sugar").
+  product("lemon").
+  product("egg").
+  product("flour").
+  product_calories("apple",1).
+  product_calories("meat",2).
+  product_calories("onion",1).
+  seller("Lattanzi").
+  seller("Verza").
+  seller("Rellman").
+  seller("Serravalle").
+  warehouse("Lattanzi Warehouse").
+  warehouse("Verza Warehouse").
+  warehouse("Rellman Warehouse").
+  warehouse("Serravalle Warehouse").
+  warehouse_shipping_cost("Lattanzi Warehouse", 7).
+  warehouse_shipping_cost("Verza Warehouse", 5).
+  warehouse_shipping_cost("Rellman Warehouse", 4).
+  warehouse_shipping_cost("Serravalle Warehouse", 3).
+  warehouse_shipping_fee("Lattanzi Warehouse", 5).
+  warehouse_shipping_fee("Verza Warehouse", 3).
+  warehouse_shipping_fee("Rellman Warehouse", 8).
+  warehouse_shipping_fee("Serravalle Warehouse", 2).
+  seller_warehouse("Lattanzi", "Lattanzi Warehouse").
+  seller_warehouse("Verza", "Verza Warehouse").
+  seller_warehouse("Rellman", "Rellman Warehouse").
+  seller_warehouse("Serravalle", "Serravalle Warehouse").
+  product_in_warehouse("apple", "Lattanzi Warehouse", 20).
+  product_in_warehouse("lemon", "Lattanzi Warehouse", 10).
+  product_in_warehouse("sugar", "Verza Warehouse", 36).
+  product_in_warehouse("apple", "Verza Warehouse", 3).
+  product_in_warehouse("flour", "Verza Warehouse", 3).
+  product_in_warehouse("meat", "Rellman Warehouse", 10).
+  product_in_warehouse("onion", "Serravalle Warehouse", 5).
+  product_in_warehouse("banana", "Serravalle Warehouse", 29).
+  product_in_warehouse("egg", "Serravalle Warehouse", 30).
+  product_price("apple", "Lattanzi Warehouse", 2).
+  product_price("lemon", "Lattanzi Warehouse", 1).
+  product_price("apple", "Verza Warehouse", 4).
+  product_price("sugar", "Verza Warehouse", 4).
+  product_price("flour", "Verza Warehouse", 2).
+  product_price("meat", "Rellman Warehouse", 7).
+  product_price("onion", "Serravalle Warehouse", 3).
+  product_price("banana", "Serravalle Warehouse", 2).
+  product_price("egg", "Serravalle Warehouse", 1).
+  recipe("Apple Pie").
+  recipe("Meat and Onion").
+  recipe_ingredient("Apple Pie", "apple", 4).
+  recipe_ingredient("Apple Pie", "flour", 3).
+  recipe_ingredient("Apple Pie", "suggar", 1).
+  recipe_ingredient("Apple Pie", "lemon", 2).
+  recipe_ingredient("Apple Pie", "egg", 3).
+  recipe_ingredient("Meat and Onion", "meat", 5).
+  recipe_ingredient("Meat and Onion", "onion", 1).
