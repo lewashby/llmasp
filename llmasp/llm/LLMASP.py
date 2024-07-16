@@ -6,11 +6,13 @@ from .LLMHandler import LLMHandler
 
 class LLMASP(AbstractLLMASP):
     
-    def __init__(self, config_file: str, behavior_file: str, behavior: str, llm: LLMHandler, solver):
+    def __init__(self, config_file: str, behavior_file: str, llm: LLMHandler, solver):
         super().__init__(config_file, behavior_file, llm, solver)
-        self.behavior = self.behaviors[behavior]
         db_file = self.load_file(self.config["knowledge_base_file"])
         self.database = db_file["database"]
+
+    def __get_atom_name(self, atom: str):
+        return atom.split("(")[0]
 
     def load_file(self, config_file: str):
         return yaml.load(open(config_file, "r"), Loader=yaml.Loader)
@@ -20,22 +22,25 @@ class LLMASP(AbstractLLMASP):
 
     def __create_queries(self, user_input: str):
         queries = {}
-        context = self.behavior["datalog"]["context"]
-        _, preprocessing_context = self.__get_property(self.config["preprocessing"], "_")
-        context = re.sub(r"\{context\}", preprocessing_context, context)
+        context = self.behavior["preprocessing"]["context"]
+        mapping = self.behavior["preprocessing"]["mapping"]
+        mapping = re.sub(r"\{input\}", user_input, mapping)
+        _, application_context = self.__get_property(self.config["preprocessing"], "_")
+        real_context = re.sub(r"\{context\}", application_context, context)
         for index, query in enumerate(self.config["preprocessing"]):
-            queries[index] = []
-            queries[index].append(self.__prompt("system", self.behavior["datalog"]["behavior"]))
-            format, system_input = list(query.items())[0]
-            real_context = re.sub(r"\{format\}", format, context)
-            queries[index].append(self.__prompt("system", real_context))
-            queries[index].append(self.__prompt("system", system_input))
-            queries[index].append(self.__prompt("user", f"USER_INPUT: {user_input}"))
+            key, value = list(query.items())[0]
+            if (key != "_"):
+                queries[index] = []
+                queries[index].append(self.__prompt("system", self.behavior["preprocessing"]["init"]))
+                queries[index].append(self.__prompt("system", real_context))
+                application_mapping = re.sub(r"\{instructions\}", value, mapping)
+                application_mapping = re.sub(r"\{atom\}", key, application_mapping)
+                queries[index].append(self.__prompt("system", application_mapping))
         return queries
     
     def __get_property(self, properties, key, is_fact=False):
         if is_fact:
-            property = list(filter(lambda x: next(iter(x)).split("(")[0] == key, properties))[0]        
+            property = list(filter(lambda x: self.__get_atom_name(next(iter(x))) == key, properties))[0]        
         else:
             property = list(filter(lambda x: next(iter(x)) == key, properties))[0]
         property_key = next(iter(property))
@@ -47,46 +52,43 @@ class LLMASP(AbstractLLMASP):
         def group_by_fact(facts: list) -> dict:
             grouped = {}
             for f in facts:
-                name = f.split("(")[0]
+                name = self.__get_atom_name(f)
                 grouped.setdefault(name, []).append(f)
             return grouped
         grouped_facts = group_by_fact(facts)
 
-        queries = [x for v in history.values() for x in v]
-        context = self.behavior["natural-language"]["context"]
         responses = []
-        _, format = self.__get_property(self.config["postprocessing"], "_")
-        _, final_response = self.__get_property(self.config["postprocessing"], "summarize")
-        _, failed_translation = self.__get_property(self.config["postprocessing"], "failed")
-        real_context = re.sub(r"\{format\}", format, context)
-        print(grouped_facts)
+        queries = [x for v in history.values() for x in v]
+        context = self.behavior["postprocessing"]["context"]
+        
+        _, application_context = self.__get_property(self.config["postprocessing"], "_")
+        application_context = re.sub(r"\{context\}", application_context, context)
+        final_response = self.behavior["postprocessing"]["summarize"]
         for fact_name in grouped_facts:
-            _, fact_translation = self.__get_property(self.config["postprocessing"], "translation")
+            fact_translation = self.behavior["postprocessing"]["mapping"]
             f_translation_key, f_translation_value = self.__get_property(self.config["postprocessing"], fact_name, is_fact=True)
-            fact_translation = re.sub(r"\{fact\}", f_translation_key, fact_translation)
-            fact_translation = re.sub(r"\{meaning\}", f_translation_value, fact_translation)
+            fact_translation = re.sub(r"\{atom\}", f_translation_key, fact_translation)
+            fact_translation = re.sub(r"\{intructions\}", f_translation_value, fact_translation)
+            fact_translation = re.sub(r"\{facts\}", "\n".join(grouped_facts[fact_name]), fact_translation)
             res = self.llm.call([*queries, *[
-                    self.__prompt("system", real_context),
+                    self.__prompt("system", self.behavior["postprocessing"]["init"]),
+                    self.__prompt("system", application_context),
                     self.__prompt("system", fact_translation),
-                    self.__prompt("user", f"[FACTS]{"\n".join(grouped_facts[fact_name])}[/FACTS]"),
                 ]])
             responses.append(res)
             print("------------------------------------------------")
             print("fact: ", fact_name)
             print(res)
-        if (len(responses) > 0):
-            final_response = re.sub(r"\{response\}", "\n".join(responses), final_response)
-            out = [self.__prompt("system", real_context), self.__prompt("system", final_response)]
-            print("------------------------------------------------")
-        else:
-            out = [self.__prompt("system", failed_translation)]
-        return self.llm.call(out)
+        
+        final_response = re.sub(r"\{responses\}", "\n".join(responses), final_response)
+        return self.llm.call([self.__prompt("system", application_context), self.__prompt("system", final_response)])
 
     def natural_to_asp(self, user_input:str):
         queries = self.__create_queries(user_input)
         created_facts = ""
         for q in queries.values():
             facts = self.llm.call(q)
+            print("query response: ", facts)
             facts = re.findall(r"\b[a-zA-Z][\w_]*\([^)]*\)\.", facts)
             facts = "\n".join(facts)
             created_facts = f"{created_facts}\n{facts}"
@@ -101,7 +103,10 @@ class LLMASP(AbstractLLMASP):
         print(created_facts)
 
         result, _, _ = self.solver.solve(asp_input)
-        print(result)
-
-        response = self.asp_to_natural(history, result)
-        print(response)
+        if (len(result) == 0):
+            print("No answer set found")
+        else:
+            print(result)
+            response = self.asp_to_natural(history, result)
+            print()
+            print(response)
