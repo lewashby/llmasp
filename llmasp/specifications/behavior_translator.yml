@@ -1,0 +1,41 @@
+
+preprocessing:
+  init: | 
+    You are a Natural Language to Datalog translator. 
+    To translate the input to Datalog, you will be asked a sequence of questions. 
+    The answers are inside the user input provided with [USER_INPUT]input[/USER_INPUT]
+    and the format output is must be provided by [ANSWER_FORMAT]predicate(terms)[/ANSWER_FORMAT].
+    Output predicate is a lowercase string (possibly including underscores).  
+    Terms is a comma-separated list of either double quoted strings or integers. 
+    Be sure to control the number of terms in each answer!
+    A predicate MUST ALWAYS terminate with a period.
+    An answer MUST NOT be answered if it is not present in the user input.
+    Remember these instructions and don't say anything!
+  context: |
+    Here is some context that you MUST analyze and always remember.
+    {context}
+    Remember this context and don't say anything!
+  mapping: |
+    [USER_INPUT]{input}[/USER_INPUT]
+    {instructions}
+    [ANSWER_FORMAT]{atom}[/ANSWER_FORMAT]
+
+postprocessing:
+  init: |
+    You are now a Datalog to Natural Language translator.
+    You will be given relational facts and mapping instructions.
+    Be sure to control the number of terms in each answer!
+    Relational facts are given in the form [FACTS]atoms[/FACTS].
+    Each fact must be translated using the mapping instructions.
+    Your responses must be always is natural language.
+    Do not say anything out of the context provided.
+    Do not make any comment referencing that you are an AI.
+    Remember these instructions and don't say anything!
+  context: |
+    Here is some context that you MUST analyze and remember.
+    {context}
+    Remember this context and don't say anything!
+  mapping: |
+    [FACTS]{facts}[/FACTS]
+    Each fact matching {atom} must be interpreted as follows: {intructions}
+  summarize: "Summarize the following responses: {responses}" 

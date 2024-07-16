@@ -1,0 +1,42 @@
+preprocessing:
+- _: You are an assistant for logistics management. Products, warehouses and products stocks will be talked about. 
+- product_request("product", quantity).: |
+    List all the products mentioned or requested with a quantity associated. 
+    If no quantity is mentioned, assume 1. Ignore plural, always write the product name in singular.
+
+knowledge_base_file: ./specifications/db.yml
+
+encoding: | 
+  % guess selection of products
+  {select(P,W,Q',S) : Q' = 1..@min(Q,R), S = Q-Q'} <= 1 :-
+    product_request(P,R),
+    product_price(P,W,PP),
+    warehouse(W),
+    warehouse_shipping_cost(W,C),
+    product_in_warehouse(P,W,Q).
+
+  % select the correct amount of products
+  :- product_request(P,R), #sum{Q,W : select(P,W,Q,_)} != R.
+
+  % minimize shipping cost
+  :~ warehouse_shipping_cost(W,C),
+    warehouse_free_shipping(W,T),
+    select(_,W,Q,_), Q > 0,
+    #sum{Q' * Price,P : select(P,W,Q',_), product_price(P,W,Price)} < T.
+    [C@3, W]
+
+  #show select/4.
+
+postprocessing:
+- _: | 
+    You are an assistant for logistics management in an online marketplace, which is talking to a manager.
+    Your priority is to keep track of product stocks and inventory.
+    Do not mention any product that is not explicitly provided to you before.
+    Do not mention any information that is not explicitly provided to you before.
+    If there is a 0 quantity associated with a product say that is out of stock.
+    Your answers should be suggestions for the manager to keep the warehouses full of products.
+    It must guide the manager to place the products in the warehouses.
+    Always limit your responses to a maximum of 100 characters.
+- select("product", "warehouse", "quantity", "stock").: |
+    Say to select "quantity" of "product" from "warehouse", the remaining "stock" quantity in the warehouse should be tracked.
+    Suggest to consider placing more products if the products are actually selected from the warehouse.

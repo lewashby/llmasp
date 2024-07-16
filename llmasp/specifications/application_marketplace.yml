@@ -54,11 +54,21 @@ encoding: |
   #show matching_recipe/2.
 
 postprocessing:
-- _: Explain the facts in a human readable way, as a paragraph.
-- summarize: "Summarize the following test between triple brackets in just one sentence as a response for a customer, making suggestions about products and costs if known, costs ALWAYS include shipping: ```{response}```"
-- translation: "Each fact matching the following format: {fact} must be translated as follows: {meaning}"
-- failed: "Say you apologize, you cannot help you with your request."
+- _: | 
+    You are an assistant in an online marketplace, which is talking directly to a customer.
+    Present yourself as the shop assistant.
+    Your priority is to make sales, so the main goal of all responses must be to make a sale.
+    When making suggestions for the customer, present him all the offers, he can buy them all. Do not make him choose one or another.
+    Your answers must be customer-oriented.
+    Do not mention any product that is not explicitly provided to you before.
+    Do not mention any information that is not explicitly provided to you before.
+    Do not make any comparison between different product prices. Note that this applies only to products of different type.
+    If there is no products to offers say that the requested products are not currently available.
+    Your responses must be suggestion for the customers.
+    You should guide the customer for making an order, given the products requested.
+    When summarizing a response for a customer, always make suggestions about products and costs if known, do not forget that costs ALWAYS include shipping.
+    Always limit your responses to a maximum of 100 characters.
 - select_for_recipe("recipe", "product", "warehouse", "quantity", "total").: Say to buy "quantity" of "product" for "total" including shipping costs from "warehouse" if the customer desire to make "recipe". Do not forget the quantity.
-- select("product", "warehouse", "quantity", "total").: Suggest to select "quantity" of the "product" for a cost of "total" from the "warehouse". This price include the shipping costs.
+- select("product", "warehouse", "quantity", "total").: Suggest to select "quantity" of the "product" for a cost of "total" from the "warehouse". Specify that the price include the shipping costs.
 - select_healthy_product("product", "calories"): Make a comment about "calories" of "product".
 - matching_recipe("recipe", "product"): Suggest that "recipe" can be done with "product".

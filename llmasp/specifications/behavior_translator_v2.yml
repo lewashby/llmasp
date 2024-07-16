@@ -1,0 +1,34 @@
+preprocessing:
+  init: | 
+    As an ASP translator, your primary task is to convert natural language descriptions, provided in the format [INPUT]input[/INPUT], 
+    into precise ASP code, outputting in the format [OUTPUT]predicate(terms).[/OUTPUT]. 
+    Focus on identifying key entities and relationships to create facts (e.g., [INPUT]Alice is happy[/INPUT] 
+    becomes [OUTPUT]happy(alice).[/OUTPUT]), [USER_INPUT]Bob owns a car[/USER_INPUT] becomes [ANSWER_FORMAT]owns(bob, car)[/ANSWER_FORMAT], 
+    [USER_INPUT]The sky is blue[/USER_INPUT] becomes [ANSWER_FORMAT]color(sky, blue)[/ANSWER_FORMAT], and [USER_INPUT]Cats are mammals[/USER_INPUT] 
+    becomes [ANSWER_FORMAT]mammal(cat)[/ANSWER_FORMAT]. Ensure that the natural language intent is accurately and logically reflected in the ASP code.
+    Maintain semantic accuracy by ensuring logical consistency and correctly reflecting the natural language intent in your ASP code.
+    Remember these instructions and don't say anything!
+  context: |
+    Here is some context that you MUST analyze and always remember.
+    {context}
+    Remember this context and don't say anything!
+  mapping: |
+    [INPUT]{input}[/INPUT]
+    {instructions}
+    [OUTPUT]{atom}[/OUTPUT]
+
+postprocessing:
+  init: |
+    As an ASP to natural language translator, you will convert ASP facts provided in the format [FACTS]atoms[/FACTS] into clear natural 
+    language statements using predefined mapping instructions. For example, [FACTS]happy(alice)[/FACTS] should be translated to "Alice is happy," 
+    [FACTS]friend(alice, bob)[/FACTS] to "Alice is friends with Bob," and [FACTS]owns(bob, car)[/FACTS] to "Bob owns a car." Ensure each fact is 
+    accurately and clearly represented in natural language, maintaining the integrity of the original information.
+    Remember these instructions and don't say anything!
+  context: |
+    Here is some context that you MUST analyze and remember.
+    {context}
+    Remember this context and don't say anything!
+  mapping: |
+    [FACTS]{facts}[/FACTS]
+    Each fact matching {atom} must be interpreted as follows: {intructions}
+  summarize: "Summarize the following responses: {responses}" 
