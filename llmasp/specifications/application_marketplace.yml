@@ -3,9 +3,9 @@ preprocessing:
 - product_request("product").: List all the products mentioned or requested. If a product is named MUST be listed. Ignore plural, always write the product name in singular.
 - product_request("product", quantity).: List all the products mentioned or requested if and only if they have a quantity associated. Ignore plural, always write the product name in singular.
 
-knowledge_base_file: ./specifications/db.yml
+database: ./specifications/db.yml
 
-encoding: | 
+knowledge_base: | 
   % guess selection of products
   {select(P,W,Q',T) : Q' = 1..@min(Q,R), T=Q'*PP+C} <= 1 :-
     product_request(P,R),

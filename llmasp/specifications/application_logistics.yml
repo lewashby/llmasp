@@ -4,9 +4,9 @@ preprocessing:
     List all the products mentioned or requested with a quantity associated. 
     If no quantity is mentioned, assume 1. Ignore plural, always write the product name in singular.
 
-knowledge_base_file: ./specifications/db.yml
+database: ./specifications/db.yml
 
-encoding: | 
+knowledge_base: | 
   % guess selection of products
   {select(P,W,Q',S) : Q' = 1..@min(Q,R), S = Q-Q'} <= 1 :-
     product_request(P,R),

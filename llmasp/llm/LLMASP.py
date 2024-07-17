@@ -8,15 +8,12 @@ class LLMASP(AbstractLLMASP):
     
     def __init__(self, config_file: str, behavior_file: str, llm: LLMHandler, solver):
         super().__init__(config_file, behavior_file, llm, solver)
-        db_file = self.load_file(self.config["knowledge_base_file"])
+        db_file = self.load_file(self.config["database"])
         self.database = db_file["database"]
 
     def __get_atom_name(self, atom: str):
         return atom.split("(")[0]
 
-    def load_file(self, config_file: str):
-        return yaml.load(open(config_file, "r"), Loader=yaml.Loader)
-    
     def __prompt(self, role: str, content: str):
         return { "role": role, "content": content }
 
@@ -47,6 +44,9 @@ class LLMASP(AbstractLLMASP):
         property_value = list(property.values())[0]
         return property_key, property_value
     
+    def load_file(self, config_file: str):
+        return yaml.load(open(config_file, "r"), Loader=yaml.Loader)
+    
     def asp_to_natural(self, history: dict, facts:list):
 
         def group_by_fact(facts: list) -> dict:
@@ -76,9 +76,6 @@ class LLMASP(AbstractLLMASP):
                     self.__prompt("system", fact_translation),
                 ]])
             responses.append(res)
-            print("------------------------------------------------")
-            print("fact: ", fact_name)
-            print(res)
         
         final_response = re.sub(r"\{responses\}", "\n".join(responses), final_response)
         return self.llm.call([self.__prompt("system", application_context), self.__prompt("system", final_response)])
@@ -88,12 +85,11 @@ class LLMASP(AbstractLLMASP):
         created_facts = ""
         for q in queries.values():
             facts = self.llm.call(q)
-            print("query response: ", facts)
             facts = re.findall(r"\b[a-zA-Z][\w_]*\([^)]*\)\.", facts)
             facts = "\n".join(facts)
             created_facts = f"{created_facts}\n{facts}"
             q.append(self.__prompt("assistant", facts))
-        asp_input = f"{created_facts}\n{self.database}\n{self.config["encoding"]}"
+        asp_input = f"{created_facts}\n{self.database}\n{self.config["knowledge_base"]}"
 
         return created_facts, asp_input, queries
 
