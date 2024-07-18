@@ -20,7 +20,8 @@ ollama serve
 
 ## Usage
 
-If you installed Ollama in an external server, first create an SSH local port forwarding.
+If you are running Ollama locally, the default IP address + port will be http://localhost:11434, for more details about Ollama and OpenAI compability go [here](https://ollama.com/blog/openai-compatibility).
+If you installed Ollama in an external server, then create an SSH local port forwarding.
 
 ```bash
 ssh -L <local_port>:<remote_server>:<remote_port> <user>@<remote_server>
