@@ -103,7 +103,7 @@ class LLMASP(AbstractLLMASP):
 
         result, _, _ = self.solver.solve(asp_input)
         if (len(result) == 0):
-            logs.extend(["answer set: not found", "outp: not found"])
+            logs.extend(["answer set: not found", "out: not found"])
         else:
             logs.append(f"answer set: {result}")
             response = self.asp_to_natural(history, result)
