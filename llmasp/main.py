@@ -7,7 +7,7 @@ def main():
 
     parser = argparse.ArgumentParser(
         prog='LLMASP Engine',
-        description='LLMASP Description',
+        description='Prototype system for smooth interaction between an LLM and an ASP solver',
         epilog='Hope you get the best answer!!!'
     )
     parser.add_argument("behavior_file", help="behavior file",  nargs='?', default=None)
