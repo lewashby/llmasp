@@ -12,7 +12,7 @@ cd llmasp
 poetry install
 ```
 
-Download and install Ollama follwing the official [documentation](https://ollama.com/download), then run
+Download and install Ollama following the official [documentation](https://ollama.com/download), then run
 
 ```bash
 ollama serve
