@@ -18,21 +18,22 @@ class LLMASP(AbstractLLMASP):
         return { "role": role, "content": content }
 
     def __create_queries(self, user_input: str):
-        queries = {}
+        queries = []
         context = self.behavior["preprocessing"]["context"]
         mapping = self.behavior["preprocessing"]["mapping"]
         mapping = re.sub(r"\{input\}", user_input, mapping)
         _, application_context = self.__get_property(self.config["preprocessing"], "_")
         real_context = re.sub(r"\{context\}", application_context, context)
-        for index, query in enumerate(self.config["preprocessing"]):
+        for query in self.config["preprocessing"]:
             key, value = list(query.items())[0]
             if (key != "_"):
-                queries[index] = []
-                queries[index].append(self.__prompt("system", self.behavior["preprocessing"]["init"]))
-                queries[index].append(self.__prompt("system", real_context))
                 application_mapping = re.sub(r"\{instructions\}", value, mapping)
                 application_mapping = re.sub(r"\{atom\}", key, application_mapping)
-                queries[index].append(self.__prompt("system", application_mapping))
+                queries.append([
+                    self.__prompt("system", self.behavior["preprocessing"]["init"]),
+                    self.__prompt("system", real_context),
+                    self.__prompt("system", application_mapping)
+                ])
         return queries
     
     def __get_property(self, properties, key, is_fact=False):
@@ -47,7 +48,7 @@ class LLMASP(AbstractLLMASP):
     def load_file(self, config_file: str):
         return yaml.load(open(config_file, "r"), Loader=yaml.Loader)
     
-    def asp_to_natural(self, history: dict, facts:list):
+    def asp_to_natural(self, history: list, facts:list):
 
         def group_by_fact(facts: list) -> dict:
             grouped = {}
@@ -58,7 +59,7 @@ class LLMASP(AbstractLLMASP):
         grouped_facts = group_by_fact(facts)
 
         responses = []
-        queries = [x for v in history.values() for x in v]
+        queries = [x for v in history for x in v]
         context = self.behavior["postprocessing"]["context"]
         
         _, application_context = self.__get_property(self.config["postprocessing"], "_")
@@ -83,7 +84,7 @@ class LLMASP(AbstractLLMASP):
     def natural_to_asp(self, user_input:str):
         queries = self.__create_queries(user_input)
         created_facts = ""
-        for q in queries.values():
+        for q in queries:
             facts = self.llm.call(q)
             facts = re.findall(r"\b[a-zA-Z][\w_]*\([^)]*\)\.", facts)
             facts = "\n".join(facts)
@@ -93,16 +94,21 @@ class LLMASP(AbstractLLMASP):
 
         return created_facts, asp_input, queries
 
-    def run(self):
-        user_input = input("input: ")
+    def run(self, user_input, verbose=0):
+        logs = []
+        output = ""
+        logs.append(f"input: {user_input}")
         created_facts, asp_input, history = self.natural_to_asp(user_input)
-        print(created_facts)
+        logs.append(f"extracted facts: {created_facts}")
 
         result, _, _ = self.solver.solve(asp_input)
         if (len(result) == 0):
-            print("No answer set found")
+            logs.extend(["answer set: not found", "outp: not found"])
         else:
-            print(result)
+            logs.append(f"answer set: {result}")
             response = self.asp_to_natural(history, result)
-            print()
-            print(response)
+            logs.append(f"output: {response}")
+            output = response
+        if (verbose == 1):
+            print("\n\n".join(logs))
+        return output

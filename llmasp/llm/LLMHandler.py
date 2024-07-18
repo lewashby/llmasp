@@ -2,7 +2,7 @@ from openai import OpenAI
 
 class LLMHandler:
     
-    def __init__(self, model_name: str, server_url: str, api_key:str="ollama"):
+    def __init__(self, model_name: str="ollama", server_url: str="http://localhost:11434/v1", api_key:str="ollama"):
         self.client = OpenAI(base_url=server_url, api_key=api_key)
         self.model = model_name
 

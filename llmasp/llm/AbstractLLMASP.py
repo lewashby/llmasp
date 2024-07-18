@@ -22,5 +22,5 @@ class AbstractLLMASP(ABC):
         pass
     
     @abstractmethod
-    def run(self):
+    def run(self, input, verbose):
         pass
