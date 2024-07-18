@@ -28,7 +28,7 @@ ssh -L <local_port>:<remote_server>:<remote_port> <user>@<remote_server>
 
 Ollama binds 127.0. 0.1 port 11434 by default
 
-Use the command-line help for usage intructions.
+Use the command-line help for usage instructions.
 
 ```bash
 cd llmasp
