@@ -32,7 +32,7 @@ class LLMASP(AbstractLLMASP):
                 queries.append([
                     self.__prompt("system", self.behavior["preprocessing"]["init"]),
                     self.__prompt("system", real_context),
-                    self.__prompt("system", application_mapping)
+                    self.__prompt("user", application_mapping)
                 ])
         return queries
     
@@ -48,7 +48,7 @@ class LLMASP(AbstractLLMASP):
     def load_file(self, config_file: str):
         return yaml.load(open(config_file, "r"), Loader=yaml.Loader)
     
-    def asp_to_natural(self, history: list, facts:list):
+    def asp_to_natural(self, history: list, facts:list, use_history: bool = True):
 
         def group_by_fact(facts: list) -> dict:
             grouped = {}
@@ -59,7 +59,10 @@ class LLMASP(AbstractLLMASP):
         grouped_facts = group_by_fact(facts)
 
         responses = []
-        queries = [x for v in history for x in v]
+        if use_history == True:
+            queries = [x for v in history for x in v]
+        else:
+            queries = []
         context = self.behavior["postprocessing"]["context"]
         
         _, application_context = self.__get_property(self.config["postprocessing"], "_")
@@ -74,12 +77,12 @@ class LLMASP(AbstractLLMASP):
             res = self.llm.call([*queries, *[
                     self.__prompt("system", self.behavior["postprocessing"]["init"]),
                     self.__prompt("system", application_context),
-                    self.__prompt("system", fact_translation),
+                    self.__prompt("user", fact_translation),
                 ]])
             responses.append(res)
         
         final_response = re.sub(r"\{responses\}", "\n".join(responses), final_response)
-        return self.llm.call([self.__prompt("system", application_context), self.__prompt("system", final_response)])
+        return self.llm.call([self.__prompt("system", application_context), self.__prompt("user", final_response)])
 
     def natural_to_asp(self, user_input:str):
         queries = self.__create_queries(user_input)
@@ -106,7 +109,7 @@ class LLMASP(AbstractLLMASP):
             logs.extend(["answer set: not found", "out: not found"])
         else:
             logs.append(f"answer set: {result}")
-            response = self.asp_to_natural(history, result)
+            response = self.asp_to_natural(history, result, use_history=False)
             logs.append(f"output: {response}")
             output = response
         if (verbose == 1):
