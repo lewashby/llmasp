@@ -17,15 +17,15 @@ def main():
     parser.add_argument("-s", "--server", type=str, help="hostname", required=True)
     parser.add_argument("-v", "--verbose", type=int, choices=[0,1], default=0, help="print every step result")
     args = parser.parse_args()
+    model = args.model
+    server = args.server
     if (args.example):
-        marketplace_example()
+        marketplace_example(model, server)
         return
     elif args.behavior_file is None or args.application_file is None:
         parser.error("behavior_file and application_file are required if --example is not set")
 
     else:
-        model = args.model
-        server = args.server
         behavior = args.behavior_file
         application = args.application_file
         verbose = args.verbose
