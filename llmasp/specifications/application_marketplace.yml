@@ -1,7 +1,7 @@
 preprocessing:
 - _: The marketplace offers food products. Products and product preferences will be talked about.
-- product_request("product").: List all the products mentioned or requested. If a product is named MUST be listed. Ignore plural, always write the product name in singular.
-- product_request("product", quantity).: List all the products mentioned or requested if and only if they have a quantity associated. Ignore plural, always write the product name in singular.
+- product_request("product").: List all the products mentioned or requested. If a product is named MUST be listed. Ignore plural, always write the product name in singular and MUST be between double quotes.
+- product_request("product", quantity).: List all the products mentioned or requested if and only if they have a quantity associated. Ignore plural, always write the product name in singular and MUST be between double quotes.
 
 database: ./specifications/db.yml
 
