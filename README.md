@@ -18,9 +18,17 @@ Download and install Ollama following the official [documentation](https://ollam
 ollama serve
 ```
 
+Make sure you downloaded the model before calling it. E.g.
+
+```bash
+ollama pull llama3
+```
+
+Go to [Ollama library](https://ollama.com/library) for all available models.
+
 ## Usage
 
-If you are running Ollama locally, the default IP address + port will be http://localhost:11434, for more details about Ollama and OpenAI compability go [here](https://ollama.com/blog/openai-compatibility).
+If you are running Ollama locally, the default IP address + port will be <http://localhost:11434>, for more details about Ollama and OpenAI compability go [here](https://ollama.com/blog/openai-compatibility).
 If you installed Ollama in an external server, then create an SSH local port forwarding.
 
 ```bash
@@ -34,6 +42,12 @@ Use the command-line help for usage instructions.
 ```bash
 cd llmasp
 poetry run python main.py --help
+```
+
+Run example case
+
+```bash
+poetry run python main.py --example -m llama3 -s http://localhost:11434/v1
 ```
 
 ## Acknowledgments
