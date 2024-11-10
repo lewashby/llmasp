@@ -106,20 +106,23 @@ class LLMASP(AbstractLLMASP):
         return created_facts, asp_input, queries
 
     def run(self, user_input, verbose=0):
-        logs = []
-        output = ""
-        logs.append(f"input: {user_input}")
-        created_facts, asp_input, history = self.natural_to_asp(user_input)
-        logs.append(f"extracted facts: {created_facts}")
+        try:
+            logs = []
+            output = ""
+            logs.append(f"input: {user_input}")
+            created_facts, asp_input, history = self.natural_to_asp(user_input)
+            logs.append(f"extracted facts: {created_facts}")
 
-        result, _, _ = self.solver.solve(asp_input)
-        if (len(result) == 0):
-            logs.extend(["answer set: not found", "out: not found"])
-        else:
-            logs.append(f"answer set: {result}")
-            response = self.asp_to_natural(history, result, use_history=False)
-            logs.append(f"output: {response}")
-            output = response
-        if (verbose == 1):
-            print("\n\n".join(logs))
-        return output
+            result, _, _ = self.solver.solve(asp_input + ".7")
+            if (len(result) == 0):
+                logs.extend(["answer set: not found", "out: not found"])
+            else:
+                logs.append(f"answer set: {result}")
+                response = self.asp_to_natural(history, result, use_history=False)
+                logs.append(f"output: {response}")
+                output = response
+            if (verbose == 1):
+                print("\n\n".join(logs))
+            return output
+        except:
+            print("Error: Generic error.")
