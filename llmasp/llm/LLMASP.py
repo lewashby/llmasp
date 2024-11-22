@@ -113,7 +113,7 @@ class LLMASP(AbstractLLMASP):
             created_facts, asp_input, history = self.natural_to_asp(user_input)
             logs.append(f"extracted facts: {created_facts}")
 
-            result, _, _ = self.solver.solve(asp_input + ".7")
+            result, _, _ = self.solver.solve(asp_input)
             if (len(result) == 0):
                 logs.extend(["answer set: not found", "out: not found"])
             else:
