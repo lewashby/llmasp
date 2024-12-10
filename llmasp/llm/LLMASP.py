@@ -2,8 +2,8 @@ import yaml
 import re
 import warnings
 
-from .AbstractLLMASP import AbstractLLMASP
-from .LLMHandler import LLMHandler
+from .abstract_llmasp import AbstractLLMASP
+from .llm_handler import LLMHandler
 
 def custom_warning_format(message, category, filename, lineno, line=None):
     return f"Warning: {message}\n"
