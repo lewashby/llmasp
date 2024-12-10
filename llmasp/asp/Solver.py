@@ -11,7 +11,7 @@ class Context:
 
 class Solver:
 
-    def solve(self, program, arguments=["--opt-strategy=usc,k,0,5" ,"--opt-usc-shrink=rgs"], timeout=2):
+    def solve(self, program, arguments=["--opt-strategy=usc,k,0,5" ,"--opt-usc-shrink=rgs"], timeout=2, context=Context):
 
         results: list = []
         handle = None
@@ -20,7 +20,7 @@ class Solver:
         
         control = Control(arguments, logger=logger)
         control.add(f"{program}")
-        control.ground([("base", [])], context=Context)
+        control.ground([("base", [])], context=context)
 
         with control.solve(on_model=on_model, async_=True) as handle:
             handle.wait(timeout)
