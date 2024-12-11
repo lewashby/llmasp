@@ -118,7 +118,10 @@ llmasp_instance = llm.LLMASP("app.yml", "beh.yml", llm_handler, solver)
 
 # Convert natural language to ASP query
 user_input = "There are directed edges from node 1 to node 3, from node 3 to node 4, from node 3 to node 5, from node 4 to node 2, and from node 2 to node 5. Is node 2 reachable from node 1?"
-created_facts, asp_input, queries = pipeline.natural_to_asp(user_input)
+# Indicate whether single or multiple queries should be made to the llm for facts extraction. 
+# It's default value is False
+single_pass = True
+created_facts, asp_input, queries = pipeline.natural_to_asp(user_input, single_pass=single_pass)
 
 # Give the input to the solver
 result, interrupted, satisfiable  = solver.solve(asp_input)
