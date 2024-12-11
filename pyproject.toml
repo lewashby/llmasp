@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "llmasp"
-version = "0.1.1"
+version = "0.1.2"
 description = "Combining LLMs and ASP for intelligent problem-solving and reasoning."
 authors = ["Luis Angel <luis.rodriguezreiners@gmail.com>"]
 readme = "PYPIREADME.md"
