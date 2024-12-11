@@ -25,23 +25,34 @@ class LLMASP(AbstractLLMASP):
     def __prompt(self, role: str, content: str):
         return { "role": role, "content": content }
 
-    def __create_queries(self, user_input: str):
+    def __create_queries(self, user_input: str, single_pass: bool = False):
         queries = []
         context = self.behavior["preprocessing"]["context"]
         mapping = self.behavior["preprocessing"]["mapping"]
         mapping = re.sub(r"\{input\}", user_input, mapping)
         _, application_context = self.__get_property(self.config["preprocessing"], "_")
         real_context = re.sub(r"\{context\}", application_context, context)
-        for query in self.config["preprocessing"]:
-            key, value = list(query.items())[0]
-            if (key != "_"):
-                application_mapping = re.sub(r"\{instructions\}", value, mapping)
-                application_mapping = re.sub(r"\{atom\}", key, application_mapping)
-                queries.append([
-                    self.__prompt("system", self.behavior["preprocessing"]["init"]),
-                    self.__prompt("system", real_context),
-                    self.__prompt("user", application_mapping)
-                ])
+        if single_pass:
+            formats, instructions = zip(*[(key, value) for query in self.config["preprocessing"] 
+                              for key, value in query.items() if key != "_"])
+            application_mapping = re.sub(r"\{instructions\}", "".join(instructions), mapping)
+            application_mapping = re.sub(r"\{atom\}", " ".join(formats), application_mapping)
+            queries.append([
+                self.__prompt("system", self.behavior["preprocessing"]["init"]),
+                self.__prompt("system", real_context),
+                self.__prompt("user", application_mapping)
+            ])
+        else:
+            for query in self.config["preprocessing"]:
+                key, value = list(query.items())[0]
+                if (key != "_"):
+                    application_mapping = re.sub(r"\{instructions\}", value, mapping)
+                    application_mapping = re.sub(r"\{atom\}", key, application_mapping)
+                    queries.append([
+                        self.__prompt("system", self.behavior["preprocessing"]["init"]),
+                        self.__prompt("system", real_context),
+                        self.__prompt("user", application_mapping)
+                    ])
         return queries
     
     def __get_property(self, properties, key, is_fact=False):
@@ -92,8 +103,8 @@ class LLMASP(AbstractLLMASP):
         final_response = re.sub(r"\{responses\}", "\n".join(responses), final_response)
         return self.llm.call([self.__prompt("system", application_context), self.__prompt("user", final_response)])
 
-    def natural_to_asp(self, user_input:str):
-        queries = self.__create_queries(user_input)
+    def natural_to_asp(self, user_input:str, single_pass: bool = False):
+        queries = self.__create_queries(user_input, single_pass=single_pass)
         created_facts = ""
         for q in queries:
             facts = self.llm.call(q)
@@ -106,12 +117,12 @@ class LLMASP(AbstractLLMASP):
 
         return created_facts, asp_input, queries
 
-    def run(self, user_input, verbose=0):
+    def run(self, user_input, single_pass, verbose=0):
         try:
             logs = []
             output = ""
             logs.append(f"input: {user_input}")
-            created_facts, asp_input, history = self.natural_to_asp(user_input)
+            created_facts, asp_input, history = self.natural_to_asp(user_input, single_pass=single_pass)
             logs.append(f"extracted facts: {created_facts}")
 
             result, _, _ = self.solver.solve(asp_input)

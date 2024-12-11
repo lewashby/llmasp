@@ -15,6 +15,7 @@ def main():
     parser.add_argument("-e", "--example", action="store_true", help="show an example")
     parser.add_argument("-m", "--model", type=str, help="model name", required=True)
     parser.add_argument("-s", "--server", type=str, help="hostname", required=True)
+    parser.add_argument("-sp", "--single-pass", action="store_true", help="single pass to llm", required=False)
     parser.add_argument("-v", "--verbose", type=int, choices=[0,1], default=0, help="print every step result")
     args = parser.parse_args()
     model = args.model
@@ -28,12 +29,13 @@ def main():
     else:
         behavior = args.behavior_file
         application = args.application_file
+        single_pass = args.single_pass
         verbose = args.verbose
         user_input = input("input: ")
         llm = LLMHandler(model, server)
         solver = Solver()
         llmasp = LLMASP(application, behavior, llm, solver)
-        response = llmasp.run(user_input, verbose=verbose)
+        response = llmasp.run(user_input, single_pass, verbose=verbose)
         if (verbose==0):
             print(response)
 
