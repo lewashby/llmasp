@@ -1,15 +1,18 @@
 [tool.poetry]
 name = "llmasp"
-version = "0.1.0"
-description = ""
+version = "0.1.1"
+description = "Combining LLMs and ASP for intelligent problem-solving and reasoning."
 authors = ["Luis Angel <luis.rodriguezreiners@gmail.com>"]
-readme = "README.md"
+readme = "PYPIREADME.md"
+
+exclude = ["llmasp/examples/**", "llmasp/specifications/**", "llmasp/main.py"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
 openai = "^1.35.5"
 pyyaml = "^6.0.1"
 dumbo-asp = "^0.3.8"
+
 
 
 [build-system]
