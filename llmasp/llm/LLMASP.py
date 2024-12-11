@@ -97,7 +97,8 @@ class LLMASP(AbstractLLMASP):
         created_facts = ""
         for q in queries:
             facts = self.llm.call(q)
-            facts = re.findall(r"\b[a-zA-Z][\w_]*\([^)]*\)\.", facts)
+            facts = re.findall(r"\b[a-zA-Z][\w_]*\([^)]*\)", facts)
+            facts = [f'{f}.' for f in facts]
             facts = "\n".join(facts)
             created_facts = f"{created_facts}\n{facts}"
             q.append(self.__prompt("assistant", facts))
