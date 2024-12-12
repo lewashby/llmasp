@@ -2,7 +2,7 @@
 name = "llmasp"
 version = "0.1.2"
 description = "Combining LLMs and ASP for intelligent problem-solving and reasoning."
-authors = ["Luis Angel <luis.rodriguezreiners@gmail.com>"]
+authors = ["Luis Angel <luis.rodriguezreiners@gmail.com>", "Mario Alviano <mario.alviano@gmail.com>"]
 readme = "PYPIREADME.md"
 
 exclude = ["llmasp/examples/**", "llmasp/specifications/**", "llmasp/main.py"]
