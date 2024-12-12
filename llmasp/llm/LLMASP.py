@@ -1,12 +1,8 @@
 import yaml
 import re
-import warnings
 
 from .abstract_llmasp import AbstractLLMASP
 from .llm_handler import LLMHandler
-
-def custom_warning_format(message, category, filename, lineno, line=None):
-    return f"Warning: {message}\n"
 class LLMASP(AbstractLLMASP):
     
     def __init__(self, config_file: str, behavior_file: str, llm: LLMHandler, solver):
@@ -16,8 +12,6 @@ class LLMASP(AbstractLLMASP):
             self.database = db_file["database"]
         except:
             self.database = ""
-            warnings.formatwarning = custom_warning_format
-            warnings.warn("Database File Not Found")
 
     def __get_atom_name(self, atom: str):
         return atom.split("(")[0]
