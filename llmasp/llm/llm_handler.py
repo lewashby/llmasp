@@ -2,8 +2,8 @@ from openai import OpenAI
 
 class LLMHandler:
     
-    def __init__(self, model_name: str="ollama", server_url: str="http://localhost:11434/v1", api_key:str="ollama"):
-        self.client = OpenAI(base_url=server_url, api_key=api_key)
+    def __init__(self, model_name: str="ollama", server_url: str="http://localhost:11434/v1", api_key:str="ollama", timeout=3600, max_retries=4):
+        self.client = OpenAI(base_url=server_url, api_key=api_key, timeout=timeout, max_retries=max_retries)
         self.model = model_name
 
     
