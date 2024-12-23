@@ -61,7 +61,7 @@ class LLMASP(AbstractLLMASP):
     def load_file(self, config_file: str):
         return yaml.load(open(config_file, "r"), Loader=yaml.Loader)
     
-    def asp_to_natural(self, history: list, facts:list, use_history: bool = True):
+    def asp_to_natural(self, facts:list, history: list, use_history: bool = True):
 
         def group_by_fact(facts: list) -> dict:
             grouped = {}
@@ -111,7 +111,7 @@ class LLMASP(AbstractLLMASP):
 
         return created_facts, asp_input, queries
 
-    def run(self, user_input, single_pass, verbose=0):
+    def run(self, user_input: str, single_pass: bool = False, use_history: bool = False, verbose: int = 0):
         try:
             logs = []
             output = ""
@@ -124,7 +124,7 @@ class LLMASP(AbstractLLMASP):
                 logs.extend(["answer set: not found", "out: not found"])
             else:
                 logs.append(f"answer set: {result}")
-                response = self.asp_to_natural(history, result, use_history=False)
+                response = self.asp_to_natural(result, history, use_history=use_history)
                 logs.append(f"output: {response}")
                 output = response
             if (verbose == 1):

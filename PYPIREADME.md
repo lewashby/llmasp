@@ -129,7 +129,7 @@ result, interrupted, satisfiable  = solver.solve(asp_input)
 # Convert ASP results to natural language
 # If you want to give more context to the model, you can pass the history
 # history = queries
-natural_response = llmasp_instance.asp_to_natural(history=[], result, use_history=False)
+natural_response = llmasp_instance.asp_to_natural(result, history=[], use_history=False)
 
 print(natural_response)
 ```
