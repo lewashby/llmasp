@@ -121,7 +121,11 @@ user_input = "There are directed edges from node 1 to node 3, from node 3 to nod
 # Indicate whether single or multiple queries should be made to the llm for facts extraction. 
 # It's default value is False
 single_pass = True
-created_facts, asp_input, queries = pipeline.natural_to_asp(user_input, single_pass=single_pass)
+# The natural_to_asp function can also receive a max_tokens parameter to control the maximum length of the LLM's response. 
+# This value can either be an integer, specifying the maximum number of tokens for the completion, or None if there is no limit. 
+# By default, the max_tokens parameter is set to None, meaning there is no restriction on the number of tokens in the response.
+max_tokens = 200  # Set max_tokens to limit the response length to 200 tokens
+created_facts, asp_input, queries, meta = pipeline.natural_to_asp(user_input, single_pass=single_pass, max_tokens=max_tokens)
 
 # Give the input to the solver
 result, interrupted, satisfiable  = solver.solve(asp_input)
