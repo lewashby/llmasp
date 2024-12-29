@@ -1,5 +1,6 @@
 import yaml
 import re
+from typing import Optional
 
 from .abstract_llmasp import AbstractLLMASP
 from .llm_handler import LLMHandler
@@ -97,11 +98,11 @@ class LLMASP(AbstractLLMASP):
         final_response = re.sub(r"\{responses\}", "\n".join(responses), final_response)
         return self.llm.call([self.__prompt("system", application_context), self.__prompt("user", final_response)])
 
-    def natural_to_asp(self, user_input:str, single_pass: bool = False):
+    def natural_to_asp(self, user_input:str, single_pass: bool = False, max_tokens:Optional[int] = None):
         queries = self.__create_queries(user_input, single_pass=single_pass)
         created_facts = ""
         for q in queries:
-            facts = self.llm.call(q)
+            facts, meta = self.llm.call(q, max_tokens=max_tokens)
             facts = re.findall(r"\b[a-zA-Z][\w_]*\([^)]*\)", facts)
             facts = [f'{f}.' for f in facts]
             facts = "\n".join(facts)
@@ -109,7 +110,7 @@ class LLMASP(AbstractLLMASP):
             q.append(self.__prompt("assistant", facts))
         asp_input = f"{created_facts}\n{self.database}\n{self.config["knowledge_base"]}"
 
-        return created_facts, asp_input, queries
+        return created_facts, asp_input, queries, meta
 
     def run(self, user_input: str, single_pass: bool = False, use_history: bool = False, verbose: int = 0):
         try:
