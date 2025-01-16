@@ -52,7 +52,7 @@ poetry run python main.py --example -m llama3 -s http://localhost:11434/v1
 
 ## Installation from PyPI
 
-Install the package from PyPI using pip by following the instructions on the [package page](https://pypi.org/project/llmasp/){:target="_blank"}.
+Install the package from PyPI using pip by following the instructions on the [package page](https://pypi.org/project/llmasp/).
 
 ## Acknowledgments
 
