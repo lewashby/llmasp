@@ -51,7 +51,7 @@ poetry run python main.py --example -m llama3 -s http://localhost:11434/v1
 ```
 
 ## Installation from PyPI
-To install and use the package directly from PyPI, you can use pip, the Python package installer. Follow the steps from the [package page](https://pypi.org/project/llmasp/).
+Install the package from PyPI using pip by following the instructions on the [package page](https://pypi.org/project/llmasp/).
 
 ## Acknowledgments
 
