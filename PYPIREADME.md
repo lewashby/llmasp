@@ -107,6 +107,11 @@ model_name = "llama3.1:8b"
 # Specify ollama server
 server = "http://localhost:11434/v1"
 
+# If you are running the model locally using Ollama and your server does not required it, there is no need for an API key.
+# Otherwise, if using OpenAI, an API key is required:
+# server = "https://api.openai.com/v1"
+# api_key = "YOUR_API_KEY"
+
 # Create an LLM handler instance
 llm_handler = llm.LLMHandler(model_name, server)
 
