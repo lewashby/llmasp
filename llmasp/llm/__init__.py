@@ -1,2 +1,2 @@
-from .llmasp import LLMASP
-from .llm_handler import LLMHandler
+from llmasp.llm.llmasp import LLMASP
+from llmasp.llm.llm_handler import LLMHandler

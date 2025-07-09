@@ -1,1 +1,1 @@
-from .solver import Solver
+from llmasp.asp.solver import Solver

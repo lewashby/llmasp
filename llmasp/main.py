@@ -1,7 +1,7 @@
-from llm import LLMASP, LLMHandler
-from asp import Solver
+from llmasp.llm import LLMASP, LLMHandler
+from llmasp.asp import Solver
 import argparse
-from examples import marketplace_example
+from llmasp.examples import marketplace_example
 
 def main():
 

@@ -88,7 +88,7 @@ class LLMASP(AbstractLLMASP):
             fact_translation = re.sub(r"\{atom\}", f_translation_key, fact_translation)
             fact_translation = re.sub(r"\{intructions\}", f_translation_value, fact_translation)
             fact_translation = re.sub(r"\{facts\}", "\n".join(grouped_facts[fact_name]), fact_translation)
-            res = self.llm.call([*queries, *[
+            res, _ = self.llm.call([*queries, *[
                     self.__prompt("system", self.behavior["postprocessing"]["init"]),
                     self.__prompt("system", application_context),
                     self.__prompt("user", fact_translation),
@@ -117,7 +117,7 @@ class LLMASP(AbstractLLMASP):
             logs = []
             output = ""
             logs.append(f"input: {user_input}")
-            created_facts, asp_input, history = self.natural_to_asp(user_input, single_pass=single_pass)
+            created_facts, asp_input, history, _ = self.natural_to_asp(user_input, single_pass=single_pass)
             logs.append(f"extracted facts: {created_facts}")
 
             result, _, _ = self.solver.solve(asp_input)
@@ -125,7 +125,7 @@ class LLMASP(AbstractLLMASP):
                 logs.extend(["answer set: not found", "out: not found"])
             else:
                 logs.append(f"answer set: {result}")
-                response = self.asp_to_natural(result, history, use_history=use_history)
+                response, _ = self.asp_to_natural(result, history, use_history=use_history)
                 logs.append(f"output: {response}")
                 output = response
             if (verbose == 1):
