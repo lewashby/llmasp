@@ -2,7 +2,11 @@
 
 LLMASP is a framework that tries to unify the potential of Large Language Models (LLMs) and the reasoning power of Answer Set Programming (ASP), a form of declarative programming oriented towards difficult search problems.
 
-## Installation
+## PyPI Installation
+
+Install the package from PyPI using pip by following the instructions on the [package page](https://pypi.org/project/llmasp/).
+
+## Local Installation
 
 Install poetry following the official [documentation](https://python-poetry.org/docs/).
 
@@ -49,10 +53,6 @@ Run example case
 ```bash
 poetry run python main.py --example -m llama3 -s http://localhost:11434/v1
 ```
-
-## Installation from PyPI
-
-Install the package from PyPI using pip by following the instructions on the [package page](https://pypi.org/project/llmasp/).
 
 ## Acknowledgments
 
