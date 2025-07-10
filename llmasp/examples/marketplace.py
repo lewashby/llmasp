@@ -1,7 +1,15 @@
-from llm import LLMASP, LLMHandler
-from asp import Solver
+"""
+Example for running the marketplace scenario with LLMASP.
+"""
 
-def marketplace_example(model, server):
+from llmasp.llm import LLMASP, LLMHandler
+from llmasp.asp import Solver
+
+
+def marketplace_example(model: str, server: str):
+    """
+    Run the marketplace example with a sample user input.
+    """
     user_input = "I would like some cooking ideas for a dessert with apples and for a main plate with meat."
     llm = LLMHandler(model, server)
     solver = Solver()

@@ -45,13 +45,13 @@ Use the command-line help for usage instructions.
 
 ```bash
 cd llmasp
-poetry run python main.py --help
+poetry run llmasp --help
 ```
 
 Run example case
 
 ```bash
-poetry run python main.py --example -m llama3 -s http://localhost:11434/v1
+poetry run llmasp --example -m llama3 -s http://localhost:11434/v1
 ```
 
 ## Acknowledgments
